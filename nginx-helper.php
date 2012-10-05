@@ -3,7 +3,7 @@
 Plugin Name: Nginx Helper
 Plugin URI: http://rtcamp.com/
 Description: An nginx helper that serves various functions.
-Version: 1.3.1
+Version: 1.3.2
 Author: rtCamp
 Author URI: http://rtcamp.com
 Requires at least: 3.0
@@ -208,7 +208,7 @@ namespace rtCamp\WP\Nginx {
 
                 $rt_all_blogs   = $wpdb->get_results($wpdb->prepare("SELECT blog_id, domain, path FROM " . $wpdb->blogs . " WHERE site_id = %d AND archived = '0' AND mature = '0' AND spam = '0' AND deleted = '0'", $wpdb->siteid));
                 $wpdb->dmtable = $wpdb->base_prefix . 'domain_mapping';
-                if($wpdb->get_var("SHOW TABLES LIKE '{$wpdb->dmtable}'") != $wpdb->dmtable) {
+                if($wpdb->get_var("SHOW TABLES LIKE '{$wpdb->dmtable}'") == $wpdb->dmtable) {
                     $rt_domain_map_sites = $wpdb->get_results( "SELECT blog_id, domain FROM {$wpdb->dmtable} ORDER BY id DESC" );
                 }
                 $rt_nginx_map   ="";
