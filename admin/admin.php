@@ -91,8 +91,13 @@ namespace rtCamp\WP\Nginx {
 						<div class="icon32" id="icon-options-nginx"><br /></div>
 						<h2>Nginx Settings</h2>
 						<div id="content_block" class="align_left">
+							<form id="purgeall" action="" method="post">
+										<?php $purge_url = add_query_arg( array( 'nginx_helper_action' => 'purge', 'nginx_helper_urls' => 'all' ) ); ?>
+										<?php $nonced_url = wp_nonce_url( $purge_url, 'nginx_helper-purge_all' ); ?>
+										<a href="<?php echo $nonced_url; ?>" class="button-primary">Purge all URLs</a>
+							</form>
 							<form id="post_form" method="post" action="#" name="smart_http_expire_form">
-					<?php if ( ! ( ! is_network_admin() && is_multisite()) ) { ?>
+								<?php if ( ! ( ! is_network_admin() && is_multisite()) ) { ?>
 
 									<input type="hidden" name="is_submit" value="1" />
 
@@ -101,22 +106,22 @@ namespace rtCamp\WP\Nginx {
 									<table class="form-table">
 										<tr valign="top">
 											<td>
-												<label for="enable_purge"><input type="checkbox" value="1" id="enable_purge" name="enable_purge"<?php checked( $rt_wp_nginx_helper->options[ 'enable_purge' ], 1 ); ?>>Enable Cache Purge (requires external settings for nginx).</label><br />
-						<?php if ( is_network_admin() ) { ?>
-													<label for="enable_map"><input type="checkbox" value="1" id="enable_map" name="enable_map"<?php checked( $rt_wp_nginx_helper->options[ 'enable_map' ], 1 ); ?>>Enable Nginx Map.</label><br />
+												<label for="enable_purge"><input type="checkbox" value="1" id="enable_purge" name="enable_purge"<?php checked( $rt_wp_nginx_helper->options[ 'enable_purge' ], 1 ); ?>>&nbsp;Enable Cache Purge (requires external settings for nginx).</label><br />
+												<?php if ( is_network_admin() ) { ?>
+													<label for="enable_map"><input type="checkbox" value="1" id="enable_map" name="enable_map"<?php checked( $rt_wp_nginx_helper->options[ 'enable_map' ], 1 ); ?>>&nbsp;Enable Nginx Map.</label><br />
 												<?php } ?>
-												<label for="enable_log"><input type="checkbox" value="1" id="enable_log" name="enable_log"<?php checked( $rt_wp_nginx_helper->options[ 'enable_log' ], 1 ); ?>>Enable Logging</label><br />
-												<label for="enable_stamp"><input type="checkbox" value="1" id="enable_stamp" name="enable_stamp"<?php checked( $rt_wp_nginx_helper->options[ 'enable_stamp' ], 1 ); ?>>Enable Nginx Timestamp in HTML</label>
+												<label for="enable_log"><input type="checkbox" value="1" id="enable_log" name="enable_log"<?php checked( $rt_wp_nginx_helper->options[ 'enable_log' ], 1 ); ?>>&nbsp;Enable Logging</label><br />
+												<label for="enable_stamp"><input type="checkbox" value="1" id="enable_stamp" name="enable_stamp"<?php checked( $rt_wp_nginx_helper->options[ 'enable_stamp' ], 1 ); ?>>&nbsp;Enable Nginx Timestamp in HTML</label>
 											</td>
 										</tr>
 									</table>
 
-						<?php
-						$displayvar = '';
-						if ( $rt_wp_nginx_helper->options[ 'enable_purge' ] == false ) {
-							$displayvar = ' style="display:none"';
-						}
-						?>
+									<?php
+									$displayvar = '';
+									if ( $rt_wp_nginx_helper->options[ 'enable_purge' ] == false ) {
+										$displayvar = ' style="display:none"';
+									}
+									?>
 									<h3<?php echo $displayvar; ?>>Purging Options</h3>
 
 									<table class="form-table rtnginx-table"<?php echo $displayvar; ?>>
@@ -184,10 +189,10 @@ namespace rtCamp\WP\Nginx {
 										</tr>
 									</table>
 
-						<?php
-					}
-					if ( is_network_admin() && $rt_wp_nginx_helper->options[ 'enable_map' ] != false ) {
-						?>
+									<?php
+								}
+								if ( is_network_admin() && $rt_wp_nginx_helper->options[ 'enable_map' ] != false ) {
+									?>
 									<h3>Nginx Map</h3>
 									<?php if ( ! is_writable( RT_WP_NGINX_HELPER_PATH . 'map.conf' ) ) { ?>
 										<span class="error fade" style="display : block"><p><?php printf( __( "Can't write on map file.<br /><br />Check you have write permission on <strong>%s</strong>", "rt_wp_nginx_helper" ), RT_WP_NGINX_HELPER_PATH . 'map.conf' ); ?></p></span>
@@ -200,7 +205,7 @@ namespace rtCamp\WP\Nginx {
 												<small>(recommended)</small>
 											</th>
 											<td>
-						<?php echo RT_WP_NGINX_HELPER_PATH . 'map.conf'; ?>
+												<?php echo RT_WP_NGINX_HELPER_PATH . 'map.conf'; ?>
 											</td>
 										</tr>
 										<tr>
@@ -215,12 +220,12 @@ namespace rtCamp\WP\Nginx {
 										</tr>
 									</table>
 
-						<?php
-						if ( $rt_wp_nginx_helper->options[ 'enable_log' ] != false ) {
-							?>
+									<?php
+									if ( $rt_wp_nginx_helper->options[ 'enable_log' ] != false ) {
+										?>
 										<h3>Logging</h3>
 
-							<?php if ( ! is_writable( RT_WP_NGINX_HELPER_PATH . 'nginx.log' ) ) { ?>
+										<?php if ( ! is_writable( RT_WP_NGINX_HELPER_PATH . 'nginx.log' ) ) { ?>
 											<span class="error fade" style="display : block"><p><?php printf( __( "Can't write on log file.<br /><br />Check you have write permission on <strong>%s</strong>", "rt_wp_nginx_helper" ), RT_WP_NGINX_HELPER_PATH . 'nginx.log' ); ?></p></span>
 										<?php } ?>
 
@@ -251,7 +256,7 @@ namespace rtCamp\WP\Nginx {
 													<th><label for="log_filesize"><?php _e( 'Max log file size', 'rt_wp_nginx_helper' ); ?></label></th>
 													<td>
 														<input id="log_filesize" class="small-text" type="text" name="log_filesize" value="<?php echo $rt_wp_nginx_helper->options[ 'log_filesize' ] ?>" /> Mb
-							<?php if ( $error_log_filesize ) { ?>
+														<?php if ( $error_log_filesize ) { ?>
 															<span class="error fade" style="display : block"><p><strong><?php echo $error_log_filesize; ?></strong></p></span>
 														<?php } ?>
 													</td>
@@ -260,16 +265,17 @@ namespace rtCamp\WP\Nginx {
 										</table>
 
 										<br />
-						<?php } ?>
+									<?php } ?>
 								<?php } ?>
 
 								<p class="submit">
 									<input type="submit" name="smart_http_expire_save" class="button-primary" value="Save" />
 								</p>
 							</form>
+
 						</div>
 						<div id="rtads" class="metabox-holder align_left">
-					<?php $this->default_admin_sidebar(); ?>
+							<?php $this->default_admin_sidebar(); ?>
 						</div>
 					</div>
 					<?php
