@@ -3,7 +3,7 @@
   Plugin Name: Nginx Helper
   Plugin URI: http://rtcamp.com/nginx-helper/
   Description: An nginx helper that serves various functions.
-  Version: 1.7.6
+  Version: 1.8
   Author: rtCamp
   Author URI: http://rtcamp.com
   Text Domain: nginx-helper
@@ -92,11 +92,8 @@ namespace rtCamp\WP\Nginx {
             global $wp_version;
             $wp_ok = version_compare($wp_version, $this->minium_WP, '>=');
             if (($wp_ok == FALSE)) {
-                add_action(
-                        'admin_notices', create_function(
-                                '', 'global $rt_wp_nginx_helper; printf (\'<div id="message" class="error"><p><strong>\' . __(\'Sorry, Nginx Helper requires WordPress %s or higher\', "nginx-helper" ) . \'</strong></p></div>\', $rt_wp_nginx_helper->minium_WP );'
-                        )
-                );
+                add_action( 'admin_notices', create_function( '', 'global $rt_wp_nginx_helper; printf (\'<div id="message" class="error"><p><strong>\' . __(\'Sorry, Nginx Helper requires WordPress %s or higher\', "nginx-helper" ) . \'</strong></p></div>\', $rt_wp_nginx_helper->minium_WP );' ) );
+                add_action( 'network_admin_notices', create_function( '', 'global $rt_wp_nginx_helper; printf (\'<div id="message" class="error"><p><strong>\' . __(\'Sorry, Nginx Helper requires WordPress %s or higher\', "nginx-helper" ) . \'</strong></p></div>\', $rt_wp_nginx_helper->minium_WP );' ) );
                 return false;
             }
 
@@ -269,6 +266,7 @@ namespace rtCamp\WP\Nginx {
 
             if ($action == 'done') {
                 add_action('admin_notices', array(&$this, 'show_notice'));
+                add_action('network_admin_notices', array(&$this, 'show_notice'));
                 return;
             }
 
@@ -324,7 +322,9 @@ namespace {
                 $status = 302;
             }
 
-            $location = wp_sanitize_redirect($location);
+            if (function_exists('wp_sanitize_redirect')) {
+                $location = wp_sanitize_redirect($location);
+            }
             header('Location: ' . $location, true, $status);
         }
 
