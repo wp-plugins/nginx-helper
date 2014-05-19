@@ -3,12 +3,12 @@
   Plugin Name: Nginx Helper
   Plugin URI: http://rtcamp.com/nginx-helper/
   Description: An nginx helper that serves various functions.
-  Version: 1.8
+  Version: 1.8.1
   Author: rtCamp
   Author URI: http://rtcamp.com
   Text Domain: nginx-helper
   Requires at least: 3.0
-  Tested up to: 3.8
+  Tested up to: 3.9.1
  */
 
 namespace rtCamp\WP\Nginx {
@@ -29,7 +29,7 @@ namespace rtCamp\WP\Nginx {
 
             // Load Plugin Text Domain
             add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-            
+
             $this->load_options();
             $this->plugin_name = plugin_basename(__FILE__);
 
@@ -152,7 +152,7 @@ namespace rtCamp\WP\Nginx {
             $this->update_map();
             $rt_wp_nginx_purger->log("New site added to nginx map (id $blog_id)");
             $helper_options = rt_wp_nginx_helper_get_options();
-            update_blog_option($blog_id, "rt_wp_nginx_helper_options", $helper_options, true);
+            update_blog_option($blog_id, "rt_wp_nginx_helper_options", $helper_options);
             $rt_wp_nginx_purger->log("Default options updated for the new blog (id $blog_id)");
         }
 
@@ -279,7 +279,7 @@ namespace rtCamp\WP\Nginx {
             }
             wp_redirect(add_query_arg(array('nginx_helper_action' => 'done')));
         }
-        
+
         /**
          * Load the translation file for current language.
          */
@@ -342,11 +342,10 @@ namespace {
         return $links;
     }
 
-    $plugin = plugin_basename(__FILE__);
     if (is_multisite()) {
-        add_filter("network_admin_plugin_action_links_$plugin", 'nginx_settings_link');
+        add_filter("network_admin_plugin_action_links_" . plugin_basename(__FILE__), 'nginx_settings_link');
     } else {
-        add_filter("plugin_action_links_$plugin", 'nginx_settings_link');
+        add_filter("plugin_action_links_" . plugin_basename(__FILE__), 'nginx_settings_link');
     }
 
     function get_feeds($feed_url = 'http://rtcamp.com/blog/feed/') {
